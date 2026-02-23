@@ -51,7 +51,7 @@ jobs:
         with:
           node-version: '18'
           cache: 'npm'
-          cache-dependency-path: services/notification-service/package-lock.json
+          cache-dependency-path: services/notification-service/package.json
       - name: Install Dependencies
         working-directory: ./services/notification-service
         run: npm install
