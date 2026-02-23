@@ -13,12 +13,14 @@ COPY requirements.txt .
 
 # 1. Upgrade critical environment tools to latest safe versions
 # 2. Install app dependencies in an isolated prefix
-# 3. Security: Explicitly remove any legacy vendored libs if they persist in setuptools (Trivy requirement)
-RUN pip install --no-cache-dir --upgrade pip wheel setuptools --retries 10 && \
+# 3. Security: Explicitly purge ANY legacy or vendored vulnerable versions (Trivy target)
+RUN pip install --no-cache-dir --upgrade pip "setuptools>=75.8.0" "wheel>=0.46.2" "jaraco.context>=6.1.0" --retries 10 && \
     pip install --no-cache-dir --default-timeout=120 --retries=10 \
     --prefix=/install -r requirements.txt && \
-    find /install -name "jaraco.context-5.3.0*" -exec rm -rf {} + && \
-    find /install -name "wheel-0.45.1*" -exec rm -rf {} +
+    find /install -type d -name "jaraco.context-5.*" -exec rm -rf {} + && \
+    find /install -type d -name "wheel-0.45*" -exec rm -rf {} + && \
+    find /install -path "*/setuptools/_vendor/jaraco.context*" -exec rm -rf {} + && \
+    find /install -path "*/setuptools/_vendor/wheel*" -exec rm -rf {} +
 
 # ── Stage 2: Runtime ───────────────────────────────────────────────────────────
 FROM python:3.11-slim
