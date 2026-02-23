@@ -94,12 +94,17 @@ jobs:
           path: /tmp
       - name: Load image
         run: docker load --input /tmp/article-service.tar
+      - name: Cache Trivy DB
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/trivy
+          key: trivy-db-${{ runner.os }}
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: 'article-service:${{ github.sha }}'
           format: 'table'
-          exit-code: '0' # Set to 0 to prevent CI failure during dev; change to 1 to block vulnerable images
+          exit-code: '1' # Block build if critical/high vulnerabilities are found
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'

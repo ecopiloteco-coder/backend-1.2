@@ -33,13 +33,19 @@
 		<!-- Spring Cloud 2024.0.1 is the compatible BOM for Spring Boot 3.4.x -->
 		<spring-cloud.version>2024.0.1</spring-cloud.version>
 
+		<!-- Security Overrides to fix Trivy detections -->
+		<spring-security.version>6.4.6</spring-security.version>
+		<tomcat.version>10.1.45</tomcat.version>
+		<postgresql.version>42.7.7</postgresql.version>
+		<spring-framework.version>6.2.11</spring-framework.version>
+
 		<!-- Explicit version overrides for libraries outside the Spring Boot BOM -->
 		<!-- xstream 1.4.19 → 1.4.21 : fixes CVE-2022-40151, CVE-2022-41966, CVE-2024-47072 -->
 		<xstream.version>1.4.21</xstream.version>
 		<!-- jettison 1.4.0 → 1.5.4  : fixes CVE-2022-40150, CVE-2022-45685, CVE-2022-45693, CVE-2023-1436 -->
 		<jettison.version>1.5.4</jettison.version>
-		<!-- lz4-java 1.8.0 → 1.8.1  : fixes CVE-2025-12183 -->
-		<lz4-java.version>1.8.1</lz4-java.version>
+		<!-- lz4-java 1.8.1 → 1.10.1 : fixes CVE-2025-66566 -->
+		<lz4-java.version>1.10.1</lz4-java.version>
 	</properties>
 
 	<dependencies>
@@ -99,11 +105,11 @@
 			<artifactId>jettison</artifactId>
 			<version>${jettison.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.lz4</groupId>
-			<artifactId>lz4-java</artifactId>
-			<version>${lz4-java.version}</version>
-		</dependency>
+		        <dependency>
+            <groupId>at.yawk.lz4</groupId>
+            <artifactId>lz4-java</artifactId>
+            <version>${lz4-java.version}</version>
+        </dependency>
 
 		<!-- Utilities -->
 		<dependency>
