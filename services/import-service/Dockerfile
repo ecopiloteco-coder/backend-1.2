@@ -13,33 +13,37 @@ COPY requirements.txt .
 
 # 1. Upgrade critical environment tools to latest safe versions
 # 2. Install app dependencies in an isolated prefix
-# 3. Security: Explicitly purge ANY legacy or vendored vulnerable versions (Trivy target)
+# 3. Security: Aggressive surgery to remove any legacy/vendored vulnerable versions (Trivy target)
 RUN pip install --no-cache-dir --upgrade pip "setuptools>=75.8.0" "wheel>=0.46.2" "jaraco.context>=6.1.0" --retries 10 && \
     pip install --no-cache-dir --default-timeout=120 --retries=10 \
     --prefix=/install -r requirements.txt && \
-    find /install -type d -name "jaraco.context-5.*" -exec rm -rf {} + && \
-    find /install -type d -name "wheel-0.45*" -exec rm -rf {} + && \
-    find /install -path "*/setuptools/_vendor/jaraco.context*" -exec rm -rf {} + && \
-    find /install -path "*/setuptools/_vendor/wheel*" -exec rm -rf {} +
+    find /install -type d -name "jaraco.context-5.*" -exec rm -rf {} + || true && \
+    find /install -type d -name "wheel-0.45*" -exec rm -rf {} + || true && \
+    find /install -path "*/setuptools/_vendor/jaraco.context*" -exec rm -rf {} + || true && \
+    find /install -path "*/setuptools/_vendor/wheel*" -exec rm -rf {} + || true
 
 # ── Stage 2: Runtime ───────────────────────────────────────────────────────────
 FROM python:3.11-slim
 
 WORKDIR /app
 
-# Upgrade system packages in the runtime image too (OpenSSL CVEs)
+# Upgrade system packages and PRE-EMPTIVELY purge base image vulnerabilities
 RUN apt-get update -o Acquire::Retries=5 && \
     apt-get upgrade -y -o Acquire::Retries=5 --no-install-recommends && \
+    find /usr/local/lib/python* -type d -name "jaraco.context-5.*" -exec rm -rf {} + || true && \
+    find /usr/local/lib/python* -type d -name "wheel-0.45*" -exec rm -rf {} + || true && \
+    find /usr/local/lib/python* -path "*/setuptools/_vendor/jaraco.context*" -exec rm -rf {} + || true && \
+    find /usr/local/lib/python* -path "*/setuptools/_vendor/wheel*" -exec rm -rf {} + || true && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy installed site-packages from builder
+# Copy installed site-packages from builder (overwriting and merging)
 COPY --from=builder /install /usr/local
 
-# Copy application source (excluding files in .dockerignore)
+# Copy application source
 COPY . .
 
-# Run as non-root user for container security
+# Run as non-root user
 RUN useradd --no-create-home --shell /bin/false appuser && \
     chown -R appuser:appuser /app
 USER appuser
