@@ -1,0 +1,132 @@
+name: Project Service CI
+
+on:
+  push:
+    branches: [ Devops2 ]
+    paths:
+      - 'services/project-service/**'
+      - '.github/workflows/project-service-ci.yml'
+  pull_request:
+    branches: [ Devops2 ]
+    paths:
+      - 'services/project-service/**'
+  workflow_dispatch:
+
+jobs:
+  # ================ SECURITY (Secrets) ===================
+  gitleaks:
+    name: Gitleaks Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install Gitleaks
+        run: |
+          wget https://github.com/gitleaks/gitleaks/releases/download/v8.18.2/gitleaks_8.18.2_linux_x64.tar.gz
+          tar -xzf gitleaks_8.18.2_linux_x64.tar.gz
+          sudo mv gitleaks /usr/local/bin/
+          
+      - name: Run Gitleaks (Full History)
+        # Standard full history scan
+        # exit-code=0 allows pipeline to continue even if leaks are found
+        run: gitleaks detect --source=services/project-service --verbose --redact --exit-code=0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+          
+      # FUTURE: Uncomment below for incremental scanning
+      # - name: Run Gitleaks (Incremental)
+      #   run: gitleaks detect --source=services/project-service --log-opts=${{ github.event.before }}..${{ github.sha }} --verbose --redact --exit-code=2
+
+  # ================ TEST ===================
+  test:
+    name: Test Project Service
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+      - name: Run tests
+        working-directory: ./services/project-service
+        run: mvn clean test
+
+  # ================ BUILD ===================
+  build:
+    name: Build Image
+    needs: [test, gitleaks]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build and export to tar
+        uses: docker/build-push-action@v5
+        with:
+          context: ./services/project-service
+          tags: project-service:${{ github.sha }}
+          outputs: type=docker,dest=/tmp/project-service.tar
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: project-service-image
+          path: /tmp/project-service.tar
+          retention-days: 1
+
+  # ================ SCAN ===================
+  scan:
+    name: Scan Image (Trivy)
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: project-service-image
+          path: /tmp
+      - name: Load image
+        run: docker load --input /tmp/project-service.tar
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'project-service:${{ github.sha }}'
+          format: 'table'
+          exit-code: '0' # Set to 0 to prevent CI failure during dev; change to 1 to block vulnerable images
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+  # ================ PUSH ===================
+  push:
+    name: Push Image
+    needs: scan
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/Devops2'
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: project-service-image
+          path: /tmp
+      - name: Load image
+        run: docker load --input /tmp/project-service.tar
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Tag and Push to DockerHub
+        run: |
+          docker tag project-service:${{ github.sha }} ${{ secrets.DOCKER_USERNAME }}/ecopilot-project-service:latest
+          docker tag project-service:${{ github.sha }} ${{ secrets.DOCKER_USERNAME }}/ecopilot-project-service:${{ github.sha }}
+          docker push ${{ secrets.DOCKER_USERNAME }}/ecopilot-project-service:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/ecopilot-project-service:${{ github.sha }}

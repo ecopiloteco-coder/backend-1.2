@@ -1,0 +1,85 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+
+  config:
+    import: "optional:configserver:http://config-service:8888/"
+
+  cloud:
+    config:
+      discovery:
+        enabled: true
+        service-id: config-server
+      fail-fast: true
+
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+
+      routes:
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/api/auth/**,/api/users/**
+
+        - id: article-service
+          uri: lb://article-service
+          predicates:
+            - Path=/api/articles/**,/api/pending-articles/**,/api/niveaux/**
+
+        - id: import-service
+          uri: http://import-service:8088
+          predicates:
+            - Path=/api/projets/preview-dpgf/**,/api/projets/preview-dpgf-sheet/**,/api/projets/parse-dpgf/**
+
+        - id: project-service
+          uri: lb://project-service
+          predicates:
+            - Path=/api/projets/**,/api/projet-details/**,/api/ouvrages/**,/api/blocs/**,/api/clients/**
+
+        - id: fournisseur-service
+          uri: lb://fournisseur-service
+          predicates:
+            - Path=/api/fournisseurs/**
+
+        - id: notification-service
+          uri: http://notification-service:8084
+          predicates:
+            - Path=/api/notifications/**
+
+        - id: notification-events-service
+          uri: http://notification-service:8084
+          predicates:
+            - Path=/api/events/**
+
+  # OAuth2 Resource Server — JWT validation via Keycloak JWKS (auto-discovery)
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${KEYCLOAK_JWKS_URI:http://keycloak:8080/realms/ecopilot/protocol/openid-connect/certs}
+
+logging:
+  level:
+    org.springframework.cloud.gateway: INFO
+    reactor.netty: INFO
+    com.ecopilot: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics"
+  endpoint:
+    health:
+      show-details: when-authorized
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://discovery-service:8761/eureka/

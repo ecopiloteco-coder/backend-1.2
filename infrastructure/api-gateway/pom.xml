@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<!--
+		Spring Boot 3.4.5 transitively upgrades:
+		  - Netty 4.1.104 → 4.1.124+    : fixes CVE-2025-55163 (HTTP/2 DDoS), CVE-2025-24970 (native crash)
+		  - nimbus-jose-jwt 9.24.4 → 9.37.2+ : fixes CVE-2023-52428 (large JWE p2c DoS)
+		  - Spring Security 6.2.1 → 6.4.4 : fixes CVE-2024-38821 (CRITICAL WebFlux bypass),
+		                                      CVE-2024-22234/22257, CVE-2025-22228
+		  - Spring Framework 6.1.2 → 6.2.x : fixes CVE-2024-22233, CVE-2025-41249,
+		                                       CVE-2024-22243/22259/22262, CVE-2024-38816/38819
+		  - Spring Boot               : fixes CVE-2025-22235
+
+		Spring Cloud 2024.0.1 upgrades:
+		  - spring-cloud-gateway-server 4.1.0 → 4.2.x : fixes CVE-2025-41235 (header forwarding from untrusted proxies)
+
+		Explicit overrides for libraries outside the Spring Boot BOM:
+		  - xstream 1.4.19 → 1.4.21    : fixes CVE-2022-40151, CVE-2022-41966, CVE-2024-47072
+		  - jettison 1.4.0 → 1.5.4     : fixes CVE-2022-40150, CVE-2022-45685/93, CVE-2023-1436
+	-->
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.4.5</version>
+		<relativePath/>
+	</parent>
+
+	<groupId>com.ecopilot</groupId>
+	<artifactId>api-gateway</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>api-gateway</name>
+	<description>API Gateway for EcoPilot</description>
+
+	<properties>
+		<java.version>17</java.version>
+		<!-- Spring Cloud 2024.0.1 is the compatible BOM for Spring Boot 3.4.x -->
+		<!-- Also upgrades spring-cloud-gateway-server 4.1.0 → 4.2.x: fixes CVE-2025-41235 -->
+		<spring-cloud.version>2024.0.1</spring-cloud.version>
+
+		<!-- Overrides for transitive deps outside the Spring Boot BOM -->
+		<!-- xstream 1.4.19 → 1.4.21 : fixes CVE-2022-40151, CVE-2022-41966, CVE-2024-47072 -->
+		<xstream.version>1.4.21</xstream.version>
+		<!-- jettison 1.4.0 → 1.5.4  : fixes CVE-2022-40150, CVE-2022-45685/93, CVE-2023-1436 -->
+		<jettison.version>1.5.4</jettison.version>
+	</properties>
+
+	<dependencies>
+		<!-- Gateway (reactive, pulls Netty + spring-cloud-gateway-server) -->
+		<!-- Netty 4.1.124+ from Spring Boot BOM: fixes CVE-2025-55163, CVE-2025-24970 -->
+		<!-- spring-cloud-gateway-server 4.2.x from Spring Cloud BOM: fixes CVE-2025-41235 -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-gateway</artifactId>
+		</dependency>
+
+		<!-- Service Discovery -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+		</dependency>
+
+		<!-- Circuit Breaker -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
+		</dependency>
+
+		<!-- Actuator -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
+		<!-- Security + OAuth2 Resource Server -->
+		<!-- Spring Security 6.4.4: fixes CVE-2024-38821 (CRITICAL), CVE-2024-22234/22257, CVE-2025-22228 -->
+		<!-- nimbus-jose-jwt 9.37.2+: fixes CVE-2023-52428; pulled by oauth2-resource-server -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+		</dependency>
+
+		<!-- Vulnerability overrides: force safe transitive versions outside the Spring BOM -->
+		<!-- xstream: CVE-2022-40151, CVE-2022-41966, CVE-2024-47072 -->
+		<dependency>
+			<groupId>com.thoughtworks.xstream</groupId>
+			<artifactId>xstream</artifactId>
+			<version>${xstream.version}</version>
+		</dependency>
+		<!-- jettison: CVE-2022-40150, CVE-2022-45685, CVE-2022-45693, CVE-2023-1436 -->
+		<dependency>
+			<groupId>org.codehaus.jettison</groupId>
+			<artifactId>jettison</artifactId>
+			<version>${jettison.version}</version>
+		</dependency>
+
+		<!-- Test -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+</project>

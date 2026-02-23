@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+        Spring Boot 3.4.5 transitively upgrades:
+          - Tomcat 10.1.16 → 10.1.45    : fixes CVE-2025-24813 (CRITICAL RCE), CVE-2024-34750,
+                                           CVE-2024-50379, CVE-2024-56337, CVE-2025-48988/89, CVE-2025-55752
+          - Spring Security 6.2.0 → 6.4.4 : fixes CVE-2025-22228
+          - Spring Framework 6.1.1 → 6.2.x : fixes CVE-2025-41249,
+                                              CVE-2024-22243/22259/22262, CVE-2024-38816/38819
+          - Spring Boot              : fixes CVE-2025-22235
+          - PostgreSQL JDBC 42.6.0 → 42.7.5 : fixes CVE-2024-1597 (CRITICAL SQL injection)
+          - logback 1.4.11 → 1.5.x    : fixes CVE-2023-6378
+
+        Explicit overrides for libraries outside the Spring Boot BOM:
+          - xstream 1.4.19 → 1.4.21   : fixes CVE-2022-40151, CVE-2022-41966, CVE-2024-47072
+          - jettison 1.4.0 → 1.5.4    : fixes CVE-2022-40150, CVE-2022-45685/93, CVE-2023-1436
+    -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.4.5</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <groupId>com.ecopilot</groupId>
+    <artifactId>fournisseur-service</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>fournisseur-service</name>
+    <description>Microservice Fournisseur for EcoPilot</description>
+
+    <properties>
+        <java.version>17</java.version>
+        <!-- Spring Cloud 2024.0.1 is the compatible BOM for Spring Boot 3.4.x -->
+        <spring-cloud.version>2024.0.1</spring-cloud.version>
+
+        <!-- Overrides for transitive deps outside the Spring Boot BOM -->
+        <!-- xstream 1.4.19 → 1.4.21 : fixes CVE-2022-40151, CVE-2022-41966, CVE-2024-47072 -->
+        <xstream.version>1.4.21</xstream.version>
+        <!-- jettison 1.4.0 → 1.5.4  : fixes CVE-2022-40150, CVE-2022-45685/93, CVE-2023-1436 -->
+        <jettison.version>1.5.4</jettison.version>
+    </properties>
+
+    <dependencies>
+        <!-- Core Web -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- Persistence -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Service Discovery & Config -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-config</artifactId>
+        </dependency>
+
+        <!-- Actuator -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!-- Security: OAuth2 Resource Server (JWT validation via Keycloak JWKS) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+        </dependency>
+
+        <!-- Messaging -->
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
+
+        <!-- Use safe versions for libraries outside the Spring Boot BOM -->
+        <!-- xstream: CVE-2022-40151, CVE-2022-41966, CVE-2024-47072 -->
+        <dependency>
+            <groupId>com.thoughtworks.xstream</groupId>
+            <artifactId>xstream</artifactId>
+            <version>${xstream.version}</version>
+        </dependency>
+        <!-- jettison: CVE-2022-40150, CVE-2022-45685, CVE-2022-45693, CVE-2023-1436 -->
+        <dependency>
+            <groupId>org.codehaus.jettison</groupId>
+            <artifactId>jettison</artifactId>
+            <version>${jettison.version}</version>
+        </dependency>
+
+        <!-- Utilities -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Test -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

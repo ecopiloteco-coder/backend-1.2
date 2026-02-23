@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+keycloak:
+  realm: ${KEYCLOAK_REALM:ecopilot}
+  resource: ecopilot-backend
+  auth-server-url: ${KEYCLOAK_URL:http://keycloak:8080}
+  credentials:
+    secret: ${KEYCLOAK_CLIENT_SECRET}
+
+logging:
+  level:
+    com.ecopilot: INFO

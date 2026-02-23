@@ -1,0 +1,7 @@
+spring:
+  web:
+    cors:
+      allowed-origins: ""
+  mvc:
+    cors:
+      allowed-origins: ""

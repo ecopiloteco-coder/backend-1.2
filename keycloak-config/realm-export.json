@@ -1,0 +1,118 @@
+{
+    "realm": "ecopilot",
+    "enabled": true,
+    "users": [
+        {
+            "username": "admin",
+            "email": "admin@ecopilot.com",
+            "firstName": "Admin",
+            "lastName": "Ecopilot",
+            "enabled": true,
+            "emailVerified": true,
+            "credentials": [
+                {
+                    "type": "password",
+                    "value": "admin",
+                    "temporary": false
+                }
+            ],
+            "realmRoles": [
+                "admin",
+                "SUPER_ADMIN",
+                "ADMINISTRATEUR_SOLUTION"
+            ]
+        },
+        {
+            "username": "user",
+            "email": "user@ecopilot.com",
+            "firstName": "User",
+            "lastName": "Demo",
+            "enabled": true,
+            "emailVerified": true,
+            "credentials": [
+                {
+                    "type": "password",
+                    "value": "password",
+                    "temporary": false
+                }
+            ],
+            "realmRoles": [
+                "CHARGES_ETUDES"
+            ]
+        }
+    ],
+    "roles": {
+        "realm": [
+            {
+                "name": "admin",
+                "description": "Administrator role"
+            },
+            {
+                "name": "SUPER_ADMIN",
+                "description": "Super Administrator"
+            },
+            {
+                "name": "ADMINISTRATEUR_SOLUTION",
+                "description": "Solution Administrator"
+            },
+            {
+                "name": "ASSISTANTE_ADMINISTRATIVE",
+                "description": "Administrative Assistant"
+            },
+            {
+                "name": "CHARGES_ETUDES",
+                "description": "Study Manager"
+            },
+            {
+                "name": "RESPONSABLES_METRES",
+                "description": "Measurement Manager"
+            },
+            {
+                "name": "CHEFS_PROJET",
+                "description": "Project Manager"
+            },
+            {
+                "name": "RESPONSABLE_ETUDES_PRIX",
+                "description": "Price Study Manager"
+            },
+            {
+                "name": "FOURNISSEURS",
+                "description": "Supplier"
+            }
+        ]
+    },
+    "clients": [
+        {
+            "clientId": "ecopilot-frontend",
+            "enabled": true,
+            "publicClient": true,
+            "directAccessGrantsEnabled": true,
+            "standardFlowEnabled": true,
+            "redirectUris": [
+                "http://localhost:3001/*",
+                "*"
+            ],
+            "webOrigins": [
+                "*"
+            ]
+        },
+        {
+            "clientId": "ecopilot-backend",
+            "enabled": true,
+            "publicClient": false,
+            "bearerOnly": false,
+            "serviceAccountsEnabled": true,
+            "secret": "eiJKCUvMjhcMCoG6FXS2BhMskslkoill",
+            "directAccessGrantsEnabled": true,
+            "standardFlowEnabled": false
+        },
+        {
+            "clientId": "admin-cli",
+            "enabled": true,
+            "publicClient": true,
+            "directAccessGrantsEnabled": true,
+            "standardFlowEnabled": false
+        }
+    ],
+    "sslRequired": "external"
+}

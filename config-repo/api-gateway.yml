@@ -1,0 +1,32 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/api/auth/**,/api/users/**
+        - id: article-service
+          uri: lb://article-service
+          predicates:
+            - Path=/api/articles/**,/api/pending-articles/**,/api/niveaux/**
+        - id: import-service
+          uri: http://import-service:8088
+          predicates:
+            - Path=/api/projets/preview-dpgf/**,/api/projets/preview-dpgf-sheet/**,/api/projets/parse-dpgf/**
+        - id: project-service
+          uri: lb://project-service
+          predicates:
+            - Path=/api/projets/**,/api/projet-details/**,/api/ouvrages/**,/api/blocs/**,/api/clients/**
+        - id: fournisseur-service
+          uri: lb://fournisseur-service
+          predicates:
+            - Path=/api/fournisseurs/**
+        - id: notification-service
+          uri: http://notification-service:8084
+          predicates:
+            - Path=/api/notifications/**
+        - id: notification-events-service
+          uri: http://notification-service:8084
+          predicates:
+            - Path=/api/events/**
