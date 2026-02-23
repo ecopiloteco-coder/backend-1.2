@@ -35,7 +35,7 @@
 		<spring-cloud.version>2024.0.1</spring-cloud.version>
 
 		<!-- Security Overrides to fix Trivy detections -->
-		<spring-security.version>6.4.6</spring-security.version>
+		<spring-security.version>6.4.10</spring-security.version>
 		<spring-framework.version>6.2.11</spring-framework.version>
 
 		<!-- Overrides for transitive deps outside the Spring Boot BOM -->

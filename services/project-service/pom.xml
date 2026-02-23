@@ -36,7 +36,7 @@
         <spring-cloud.version>2024.0.1</spring-cloud.version>
 
         <!-- Security Overrides to fix Trivy detections -->
-        <spring-security.version>6.4.6</spring-security.version>
+        <spring-security.version>6.4.10</spring-security.version>
         <tomcat.version>10.1.45</tomcat.version>
         <postgresql.version>42.7.7</postgresql.version>
         <spring-framework.version>6.2.11</spring-framework.version>
@@ -92,6 +92,12 @@
         <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.lz4</groupId>
+                    <artifactId>lz4-java</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Vulnerability overrides: force safe transitive versions -->

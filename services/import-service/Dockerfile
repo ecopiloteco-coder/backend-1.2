@@ -12,7 +12,7 @@ RUN apt-get update && \
 
 COPY requirements.txt .
 
-RUN pip install --no-cache-dir --upgrade pip wheel && \
+RUN pip install --no-cache-dir --upgrade pip wheel==0.46.3 setuptools==82.0.0 && \
     pip install --no-cache-dir --default-timeout=120 --retries=5 \
     --prefix=/install -r requirements.txt
 
