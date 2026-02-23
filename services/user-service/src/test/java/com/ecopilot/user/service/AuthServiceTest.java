@@ -212,7 +212,7 @@ class AuthServiceTest {
                     .build();
 
             when(userRepository.save(any(User.class))).thenReturn(savedUser);
-            doNothing().when(eventProducer).sendUserCreatedEvent(anyLong(), anyString(), anyString(), anyString());
+            doNothing().when(eventProducer).sendUserCreatedEvent(anyLong(), anyString(), anyString(), anyString(), anyString());
 
             // Act
             UserDTO result = authService.signup(signupRequest);
@@ -230,7 +230,8 @@ class AuthServiceTest {
                     eq(savedUser.getId()),
                     eq(savedUser.getEmail()),
                     eq(savedUser.getNomUtilisateur()),
-                    eq(savedUser.getTitrePoste().getValue())
+                    eq(savedUser.getTitrePoste().getValue()),
+                    eq(savedUser.getKeycloakId())
             );
         }
 
@@ -344,7 +345,7 @@ class AuthServiceTest {
                     .isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
 
             verify(userRepository, never()).save(any());
-            verify(eventProducer, never()).sendUserCreatedEvent(anyLong(), anyString(), anyString(), anyString());
+            verify(eventProducer, never()).sendUserCreatedEvent(anyLong(), anyString(), anyString(), anyString(), anyString());
         }
 
         @Test
@@ -378,7 +379,8 @@ class AuthServiceTest {
                     eq(savedUser.getId()),
                     eq(savedUser.getEmail()),
                     eq(savedUser.getNomUtilisateur()),
-                    eq(savedUser.getTitrePoste().getValue())
+                    eq(savedUser.getTitrePoste().getValue()),
+                    eq(savedUser.getKeycloakId())
             );
         }
     }

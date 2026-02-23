@@ -14,11 +14,21 @@ spring:
   h2:
     console:
       enabled: true
+  kafka:
+    bootstrap-servers: 127.0.0.1:9092
+    listener:
+      auto-startup: false
   cloud:
     config:
       enabled: false
       discovery:
         enabled: false
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8080/realms/ecopilot/protocol/openid-connect/certs
+
 server:
   port: 0
 
