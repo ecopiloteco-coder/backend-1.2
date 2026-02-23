@@ -31,8 +31,9 @@ WORKDIR /app
 # Upgrade system packages and PRE-EMPTIVELY purge base image vulnerabilities
 RUN apt-get update -o Acquire::Retries=5 && \
     apt-get upgrade -y -o Acquire::Retries=5 --no-install-recommends && \
-    find /usr/local/lib/python* -path "*/setuptools/_vendor/jaraco.context*" -exec rm -rf {} + || true && \
-    find /usr/local/lib/python* -path "*/setuptools/_vendor/wheel*" -exec rm -rf {} + || true && \
+    find /usr/local/lib/python* -name "wheel*" -exec rm -rf {} + || true && \
+    find /usr/local/lib/python* -name "setuptools*" -exec rm -rf {} + || true && \
+    find /usr/local/lib/python* -name "jaraco.context*" -exec rm -rf {} + || true && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
