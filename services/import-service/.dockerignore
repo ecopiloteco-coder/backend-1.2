@@ -1,0 +1,9 @@
+__pycache__
+*.py[cod]
+*$py.class
+.pytest_cache
+tests/
+Dockerfile
+.dockerignore
+README.md
+TESTS_README.md

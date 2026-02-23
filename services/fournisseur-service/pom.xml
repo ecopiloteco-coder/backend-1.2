@@ -39,6 +39,8 @@
 
         <!-- Security Overrides to fix Trivy detections -->
         <spring-security.version>6.4.10</spring-security.version>
+        <commons-io.version>2.18.0</commons-io.version>
+        <netty.version>4.1.124.Final</netty.version>
         <tomcat.version>10.1.45</tomcat.version>
         <postgresql.version>42.7.7</postgresql.version>
         <spring-framework.version>6.2.11</spring-framework.version>

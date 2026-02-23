@@ -1,7 +1,7 @@
-fastapi==0.131.0         # updated: embeds starlette>=0.40.0 (fixes CVE-2024-47874)
-starlette==0.52.1        # explicit: fixes CVE-2025-62727
-jaraco.context==6.1.0    # added: fixes CVE-2026-23949
-uvicorn==0.34.0           # updated: latest stable
+fastapi==0.131.0
+starlette==0.52.1
+jaraco.context==6.1.0
+uvicorn==0.34.0
 
 # Data & file parsing
 pandas==2.2.3             # updated: minor security patch

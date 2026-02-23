@@ -42,6 +42,10 @@
 		<!-- Security Overrides to fix Trivy detections -->
 		<spring-security.version>6.4.10</spring-security.version>
 		<spring-framework.version>6.2.11</spring-framework.version>
+		<commons-io.version>2.18.0</commons-io.version>
+		<netty.version>4.1.124.Final</netty.version>
+		<!-- Explicitly override spring-cloud-gateway-server to fix CVE-2025-41235 & CVE-2025-41253 -->
+		<spring-cloud-gateway.version>4.2.6</spring-cloud-gateway.version>
 
 		<!-- Overrides for transitive deps outside the Spring Boot BOM -->
 		<!-- xstream 1.4.19 → 1.4.21 : fixes CVE-2022-40151, CVE-2022-41966, CVE-2024-47072 -->
@@ -95,6 +99,24 @@
 			<groupId>com.thoughtworks.xstream</groupId>
 			<artifactId>xstream</artifactId>
 			<version>${xstream.version}</version>
+		</dependency>
+		<!-- commons-io: CVE-2024-47554 -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>${commons-io.version}</version>
+		</dependency>
+		<!-- netty: CVE-2025-55163 -->
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-codec-http2</artifactId>
+			<version>${netty.version}</version>
+		</dependency>
+		<!-- spring-cloud-gateway-server: CVE-2025-41235, CVE-2025-41253 -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-gateway-server</artifactId>
+			<version>${spring-cloud-gateway.version}</version>
 		</dependency>
 		<!-- jettison: CVE-2022-40150, CVE-2022-45685, CVE-2022-45693, CVE-2023-1436 -->
 		<dependency>
