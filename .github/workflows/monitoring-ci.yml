@@ -2,12 +2,12 @@ name: Monitoring CI
 
 on:
   push:
-    branches: [ Devops2 ]
+    branches: [ main ]
     paths:
       - 'infrastructure/monitoring/**'
       - '.github/workflows/monitoring-ci.yml'
   pull_request:
-    branches: [ Devops2 ]
+    branches: [ main ]
     paths:
       - 'infrastructure/monitoring/**'
   workflow_dispatch:

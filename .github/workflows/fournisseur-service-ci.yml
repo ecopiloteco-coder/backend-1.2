@@ -2,12 +2,12 @@ name: Fournisseur Service CI
 
 on:
   push:
-    branches: [ Devops2 ]
+    branches: [ main ]
     paths:
       - 'services/fournisseur-service/**'
       - '.github/workflows/fournisseur-service-ci.yml'
   pull_request:
-    branches: [ Devops2 ]
+    branches: [ main ]
     paths:
       - 'services/fournisseur-service/**'
   workflow_dispatch:
@@ -54,7 +54,7 @@ jobs:
           cache: 'maven'
       - name: Run tests
         working-directory: ./services/fournisseur-service
-        run: mvn clean test
+        run: mvn clean test -Dspring.profiles.active=test -Dmaven.wagon.http.retryHandler.count=3 -Dhttp.keepAlive=false
 
   # ================ BUILD ===================
   build:
@@ -114,7 +114,7 @@ jobs:
     name: Push Image
     needs: scan
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/Devops2'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v4
